@@ -61,7 +61,8 @@ char cmd[512];
 uint8_t icmd = 0;
 
 /* ESP8266 variables */
-#define THINGSPEAK_ADDRESS	"api.thingspeak.com"
+//#define THINGSPEAK_ADDRESS	"api.thingspeak.com"
+#define THINGSPEAK_ADDRESS	"192.168.1.86"
 #define THINGSPEAK_API_KEY	"5ZRXVI7HIJQPGKID"				// Enter your Write API here
 //#define WIFI_SSID			"Kitchen"
 //#define WIFI_PASS			"Papanina36"
@@ -130,7 +131,8 @@ int main(void)
 	/* Start UART4 DMA Reception */
 	HAL_UART_Receive_DMA(&huart2, rx, BUF_SIZE);
 
-	sprintf(wifi_cmd,"\nHello ThingSpeak! \n\r");
+	//sprintf(wifi_cmd,"\nHello ThingSpeak! \n\r");
+	sprintf(wifi_cmd,"\nHello Impulse \n\r");
 	HAL_UART_Transmit(&huart1, (uint8_t *)wifi_cmd, strlen(wifi_cmd), 100);
   	HAL_Delay(100);
 
@@ -179,12 +181,14 @@ int main(void)
   {
 	i++;
 	char http_req[200];
-	sprintf(http_req, "GET /update?api_key=%s&field1=%d\r\n\r\n",THINGSPEAK_API_KEY,i); // rand() % 100);
+	//sprintf(http_req, "GET /update?api_key=%s&field1=%d\r\n\r\n",THINGSPEAK_API_KEY,i); // rand() % 100);
+	sprintf(http_req, "http://192.168.1.86/menu.htm\r\n");
+
 	/* Connect to server */
 	sprintf(wifi_cmd, "AT+CIPSTART=\"TCP\",\"%s\",80\r\n", THINGSPEAK_ADDRESS);
 	HAL_UART_Transmit(&huart1, (uint8_t *)wifi_cmd, strlen(wifi_cmd), 1000);
 	HAL_UART_Transmit(&huart2, (uint8_t *)wifi_cmd, strlen(wifi_cmd), 1000);
-	HAL_Delay(5000);
+	HAL_Delay(2000);
 	UART_Read();
 	/* Send data length (length of request) */
 	sprintf(wifi_cmd, "AT+CIPSEND=%d\r\n", strlen(http_req));
@@ -197,8 +201,56 @@ int main(void)
 	HAL_UART_Transmit(&huart2, (uint8_t *)http_req, strlen(http_req), 1000);
 	HAL_Delay(100);
 	UART_Read();
+
+
+
+	sprintf(http_req, "http://192.168.1.86/cgi-bin/web_is_local?_=1530358626355\r\n");
+
+	/* Connect to server */
+	sprintf(wifi_cmd, "AT+CIPSTART=\"TCP\",\"%s\",80\r\n", THINGSPEAK_ADDRESS);
+	HAL_UART_Transmit(&huart1, (uint8_t *)wifi_cmd, strlen(wifi_cmd), 1000);
+	HAL_UART_Transmit(&huart2, (uint8_t *)wifi_cmd, strlen(wifi_cmd), 1000);
+	HAL_Delay(2000);
+	UART_Read();
+
+	/* Send data length (length of request) */
+	sprintf(wifi_cmd, "AT+CIPSEND=%d\r\n", strlen(http_req));
+	HAL_UART_Transmit(&huart1, (uint8_t *)wifi_cmd, strlen(wifi_cmd), 1000);
+	HAL_UART_Transmit(&huart2, (uint8_t *)wifi_cmd, strlen(wifi_cmd), 1000);
+	HAL_Delay(2000); // wait for ">"
+	UART_Read();
+	/* Send data */
+	HAL_UART_Transmit(&huart1, (uint8_t *)http_req, strlen(http_req), 1000);
+	HAL_UART_Transmit(&huart2, (uint8_t *)http_req, strlen(http_req), 1000);
+	HAL_Delay(100);
+	UART_Read();
+
+
+
+	sprintf(http_req, "http://192.168.1.86/cgi-bin/ow_set_reg/19.4/1/1/?_=1530358346812\r\n");
+
+	/* Connect to server */
+	sprintf(wifi_cmd, "AT+CIPSTART=\"TCP\",\"%s\",80\r\n", THINGSPEAK_ADDRESS);
+	HAL_UART_Transmit(&huart1, (uint8_t *)wifi_cmd, strlen(wifi_cmd), 1000);
+	HAL_UART_Transmit(&huart2, (uint8_t *)wifi_cmd, strlen(wifi_cmd), 1000);
+	HAL_Delay(2000);
+	UART_Read();
+
+	/* Send data length (length of request) */
+	sprintf(wifi_cmd, "AT+CIPSEND=%d\r\n", strlen(http_req));
+	HAL_UART_Transmit(&huart1, (uint8_t *)wifi_cmd, strlen(wifi_cmd), 1000);
+	HAL_UART_Transmit(&huart2, (uint8_t *)wifi_cmd, strlen(wifi_cmd), 1000);
+	HAL_Delay(2000); // wait for ">"
+	UART_Read();
+	/* Send data */
+	HAL_UART_Transmit(&huart1, (uint8_t *)http_req, strlen(http_req), 1000);
+	HAL_UART_Transmit(&huart2, (uint8_t *)http_req, strlen(http_req), 1000);
+	HAL_Delay(100);
+	UART_Read();
+
+
 	/* Wait for next transmission (at least 15 sec for 1 loop) */
-	HAL_Delay(13000);
+	HAL_Delay(10000);
 
 
   /* USER CODE END WHILE */
